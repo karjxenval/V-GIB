@@ -1,0 +1,8 @@
+cff-version: 1.2.0
+title: "Variational Geometric Information Bottleneck Experiments"
+message: "If you use this code, please cite the associated paper or repository release."
+authors:
+  - family-names: Katende
+    given-names: Ronald
+version: 0.1.0
+date-released: 2026-06-19
