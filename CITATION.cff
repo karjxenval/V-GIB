@@ -6,3 +6,10 @@ authors:
     given-names: Ronald
 version: 0.1.0
 date-released: 2026-06-19
+repository-code: "https://github.com/karjxenval/V-GIB"
+license: MIT
+keywords:
+  - information bottleneck
+  - representation learning
+  - geometric regularization
+  - data-efficient learning

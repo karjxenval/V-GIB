@@ -14,4 +14,9 @@ dependencies:
   - tqdm
   - h5py
   - seaborn
+  - pytest
   - pip
+  - pip:
+      - ruff>=0.5
+      - build>=1.2
+      - twine>=5.0
