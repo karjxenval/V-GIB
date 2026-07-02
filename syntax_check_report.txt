@@ -1,0 +1,10 @@
+OK     legacy/train_cifar_geom.py
+OK     legacy/untitled7.py
+OK     legacy/vib_vgib_sanity_checks.py
+OK     scripts/plot_validation.py
+OK     scripts/vgib_plots.py
+OK     src/complete_stronger_validation.py
+OK     src/vgib_experiments.py
+OK     src/vgib_real_benchmarks.py
+OK     tools/verify_syntax.py
+Checked 9 Python files.

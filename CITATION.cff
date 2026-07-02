@@ -1,15 +1,8 @@
 cff-version: 1.2.0
-title: "Variational Geometric Information Bottleneck Experiments"
-message: "If you use this code, please cite the associated paper or repository release."
+title: "V-GIB: Variational Geometric Information Bottleneck"
+message: "If you use this code, please cite the accompanying manuscript."
 authors:
   - family-names: Katende
     given-names: Ronald
-version: 0.1.0
-date-released: 2026-06-19
 repository-code: "https://github.com/karjxenval/V-GIB"
-license: MIT
-keywords:
-  - information bottleneck
-  - representation learning
-  - geometric regularization
-  - data-efficient learning
+version: "0.1.0"

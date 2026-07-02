@@ -1,119 +1,65 @@
-# Variational Geometric Information Bottleneck (V-GIB)
+# V-GIB: Variational Geometric Information Bottleneck
 
-Research code for validating **Variational Geometric Information Bottleneck (V-GIB)** models under data-constrained learning. The repository contains synthetic manifold experiments, image benchmarks, tabular benchmarks, geometric diagnostics, and plotting utilities.
+This repository contains the reproducibility code for the manuscript:
 
-The core idea is to compare ordinary empirical risk minimization, variational bottleneck baselines, and geometry-aware bottleneck variants using predictive performance plus diagnostic proxies for compression, curvature, intrinsic dimension, and utility.
+**Geometry as a Missing Axis of Representation Quality: The Variational Geometric Information Bottleneck under Data Scarcity**
 
-## Repository status
+The code supports experiments for geometry-aware information bottleneck learning under label scarcity. It includes real benchmark runs, diagnostic plotting scripts, and legacy/sanity-check scripts used during development.
 
-This repository is organized from the original research scripts into a more public-facing structure. The main recommended entry point is:
+## Repository layout
 
-```bash
-python scripts/run_real_benchmarks.py --help
+```text
+V-GIB-reproducibility/
+├── src/
+│   ├── vgib_real_benchmarks.py          # Main reviewer-facing benchmark suite
+│   ├── complete_stronger_validation.py  # Earlier complete validation pipeline
+│   └── vgib_experiments.py              # Unified synthetic/FashionMNIST/CIFAR experiments
+├── scripts/
+│   ├── vgib_plots.py                    # Plots/tables from vgib_experiments.py logs
+│   └── plot_validation.py               # CIFAR validation plotting utility
+├── legacy/
+│   ├── train_cifar_geom.py              # Earlier CIFAR-specific training script
+│   ├── vib_vgib_sanity_checks.py        # Synthetic sanity checks
+│   └── untitled7.py                     # Empty notebook-export stub retained for provenance
+├── docs/
+│   ├── REPRODUCIBILITY.md
+│   └── NOTES_FOR_MANUSCRIPT.md
+├── tools/
+│   └── verify_syntax.py
+├── requirements.txt
+├── .gitignore
+├── DESCRIPTION.md
+└── MANIFEST.md
 ```
 
-Use the `scripts/` directory for the cleaned public workflow. The `legacy/` directory keeps older exploratory scripts for reproducibility and traceability, but these are not the preferred public interface.
+## Recommended entry point
 
-## Main features
+Use `src/vgib_real_benchmarks.py` as the main script for the paper. It trains matched baselines and V-GIB variants on real datasets under low-label regimes and writes CSV summaries/plots.
 
-- Real benchmark suite for Fashion-MNIST, CIFAR-10, PCAM, Covertype, and Breast Cancer.
-- Matched method comparison: ERM, VIB, V-GIB, and V-GIB ablations.
-- Low-label regimes with multiple seeds.
-- Geometric diagnostics: Jacobian/Hessian proxies, participation-ratio intrinsic dimension, KL compression proxy, and utility proxy.
-- CSV logs, aggregate summaries, Markdown summaries, and publication-style figures.
-
-## Installation
-
-Create a fresh environment:
+### Smoke test
 
 ```bash
-conda create -n vgib python=3.10 -y
-conda activate vgib
-pip install -r requirements.txt
+python src/vgib_real_benchmarks.py   --root ./data   --outdir ./runs/smoke   --datasets fashionmnist breast_cancer   --methods erm vib vgib   --fractions 0.05   --seeds 13   --epochs 3   --batch-size 64   --download
 ```
 
-For GPU runs, install the PyTorch build matching your CUDA version from the official PyTorch installation instructions, then install the remaining requirements.
-
-## Smoke test
-
-This is the safest first test on a normal laptop:
+### Main benchmark-style run
 
 ```bash
-python scripts/run_real_benchmarks.py \
-  --root ./data \
-  --outdir ./runs/smoke \
-  --datasets breast_cancer \
-  --methods erm vib vgib \
-  --fractions 0.20 \
-  --seeds 13 \
-  --epochs 2 \
-  --batch-size 32 \
-  --max-train-samples 300 \
-  --max-eval-samples 200 \
-  --device cpu
+python src/vgib_real_benchmarks.py   --root ./data   --outdir ./runs/vgib_real_full   --datasets breast_cancer fashionmnist cifar10 covtype   --methods erm vib vgib vgib_no_curv vgib_no_dim   --fractions 0.01 0.05 0.10 0.20   --seeds 13 29 47   --epochs 25   --batch-size 128   --latent-dim 64   --curvature-mode jacobian   --download
 ```
 
-A slightly heavier smoke test using Fashion-MNIST:
+Use PCam only if your local `torchvision`/`h5py`/dataset setup works reliably. The manuscript should not rely on incomplete PCam runs unless complete matched outputs are available.
+
+## Basic syntax check
 
 ```bash
-python scripts/run_real_benchmarks.py \
-  --root ./data \
-  --outdir ./runs/fashion_smoke \
-  --datasets fashionmnist \
-  --methods erm vib vgib \
-  --fractions 0.05 \
-  --seeds 13 \
-  --epochs 3 \
-  --batch-size 64 \
-  --download
+python tools/verify_syntax.py
 ```
 
-## Full benchmark example
+This only verifies Python syntax. It does not run the full experiments.
 
-```bash
-python scripts/run_real_benchmarks.py \
-  --root ./data \
-  --outdir ./runs/vgib_real_full \
-  --datasets cifar10 pcam covtype \
-  --methods erm vib vgib vgib_no_curv vgib_no_dim \
-  --fractions 0.01 0.05 0.10 0.20 \
-  --seeds 13 29 47 \
-  --epochs 25 \
-  --batch-size 128 \
-  --latent-dim 64 \
-  --curvature-mode jacobian \
-  --download \
-  --make-embeddings
-```
+## Notes
 
-## Plotting
-
-For logs produced by the older unified experiment script:
-
-```bash
-python scripts/plot_experiment_logs.py --base-dir ./runs --out-dir ./figures
-```
-
-For CIFAR validation CSV logs with columns such as `epoch`, `test_acc`, `align_mi`, and `eff_ratio`:
-
-```bash
-python scripts/plot_validation.py --logdir ./logs --outdir ./figs --tablesdir ./tables
-```
-
-## Outputs
-
-Typical outputs are written under `runs/`, `figures/`, or `tables/`:
-
-- `all_runs.csv`: raw per-run metrics.
-- `summary_mean_std.csv`: aggregate results across seeds.
-- `run_config.json`: reproducibility metadata.
-- `summary.md`: readable run summary.
-- `.png` or `.pdf` figures for accuracy, F1, AUROC, curvature, dimension ratio, and utility diagnostics.
-
-## Recommended citation
-
-A `CITATION.cff` file is included as a placeholder. Update the manuscript title, author details, DOI/arXiv link, and release version before making the repository public.
-
-## Important notes
-
-The geometric and information quantities in this repository are diagnostic proxies, not exact population-level estimates. They should be interpreted as empirical validation tools for comparing methods under controlled experimental settings.
+- The repository does not include downloaded datasets or trained model checkpoints.
+- Large outputs should stay outside Git or be attached through a release/Zenodo archive.
+- Before public release, choose a license, for example MIT, BSD-3-Clause, Apache-2.0, or a more restrictive academic license.

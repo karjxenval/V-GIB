@@ -1,42 +1,30 @@
-# Reproducibility guide
+# Reproducibility notes
 
-## Recommended environment
+## Environment
 
-```bash
-conda env create -f environment.yml
-conda activate vgib
-pip install -e .
-pip install -r requirements-dev.txt
-```
-
-## Environment check
+Create a fresh Python environment, then install dependencies:
 
 ```bash
-python scripts/vgib_doctor.py
+pip install -r requirements.txt
 ```
 
-## Smoke test
+For GPU use, install the `torch` and `torchvision` builds matching your CUDA version.
 
-```bash
-python scripts/vgib_smoke_runner.py --outdir runs/smoke_industry --device cpu
-python scripts/vgib_result_gate.py --run-dir runs/smoke_industry --min-rows 1
-```
+## Determinism
 
-## Reproducibility metadata
+The main benchmark script sets Python, NumPy, and PyTorch seeds and turns on deterministic CuDNN settings where possible. Exact equality across machines is still not guaranteed because GPU kernels, package versions, and hardware may differ.
 
-Each benchmark run should produce:
+## Outputs
 
-- `run_config.json` with run settings.
-- `all_runs.csv` with per-run metrics.
-- `summary_mean_std.csv` with aggregated metrics.
-- `summary.md` with a readable report.
+Typical outputs are stored under the selected `--outdir`, including:
 
-## Release manifest
+- per-run CSV logs,
+- aggregate summaries,
+- diagnostic plots,
+- optional embedding visualizations.
 
-Before publishing a release:
+Do not commit large datasets, checkpoints, or raw run directories to Git. Use `.gitignore` or attach them through a release/archive.
 
-```bash
-python scripts/vgib_release_manifest.py --out RELEASE_MANIFEST_SHA256.txt
-```
+## Recommended reporting
 
-This records file hashes for source, scripts, tests, and docs.
+For manuscript tables, report mean ± standard deviation over seeds. Keep CovType as supporting optimization evidence unless full validation/test summaries are available.
